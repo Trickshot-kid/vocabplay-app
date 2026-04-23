@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VocabPlay — Synonyms & Antonyms Classroom App</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --surface: #fffdf8;
+  --surface2: #f0ebe0;
+  --ink: #1a1410;
+  --ink2: #4a3f32;
+  --ink3: #8a7a6a;
+  --accent: #d4500a;
+  --accent2: #2a6b4a;
+  --accent3: #3a5a8a;
+  --gold: #c8960a;
+  --border: #d8cfc0;
+  --r: 12px;
+  --shadow: 0 2px 12px rgba(26,20,16,0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+/* NAV */
+nav{background:var(--ink);color:#fff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;letter-spacing:-0.5px;}
+.logo span{color:#f0a060;}
+.nav-tabs{display:flex;gap:4px;}
+.nav-tab{padding:6px 14px;border-radius:6px;background:transparent;color:rgba(255,255,255,0.7);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.2s;}
+.nav-tab:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.nav-tab.active{background:#d4500a;color:#fff;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.progress-pill{background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,0.8);}
+/* PAGES */
+.page{display:none;padding:2rem;max-width:1100px;margin:0 auto;}
+.page.active{display:block;}
+/* HERO */
+.hero{background:var(--ink);border-radius:20px;padding:3rem;color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;margin-bottom:2rem;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;right:-40px;top:-40px;width:280px;height:280px;border-radius:50%;background:rgba(212,80,10,0.15);}
+.hero-title{font-family:'DM Serif Display',serif;font-size:42px;line-height:1.1;margin-bottom:1rem;}
+.hero-title em{color:#f0a060;font-style:italic;}
+.hero-sub{font-size:15px;color:rgba(255,255,255,0.7);line-height:1.6;margin-bottom:1.5rem;}
+.btn-primary{background:#d4500a;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-block;}
+.btn-primary:hover{background:#b8420a;transform:translateY(-1px);}
+.btn-secondary{background:transparent;color:var(--ink);border:1.5px solid var(--border);padding:10px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.btn-secondary:hover{background:var(--surface2);}
+.hero-stats{display:flex;gap:1.5rem;}
+.hero-stat{text-align:center;}
+.hero-stat-num{font-family:'DM Serif Display',serif;font-size:32px;color:#f0a060;}
+.hero-stat-label{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;}
+/* MODULE CARDS */
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2rem;}
+.module-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.5rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.module-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transition:transform 0.2s;transform-origin:left;}
+.module-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+.module-card:hover::after{transform:scaleX(1);}
+.module-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:1rem;}
+.module-title{font-size:15px;font-weight:600;margin-bottom:4px;}
+.module-desc{font-size:12px;color:var(--ink3);line-height:1.5;}
+.module-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:8px;}
+/* SECTION HEADERS */
+.section-head{margin-bottom:1.5rem;}
+.section-head h2{font-family:'DM Serif Display',serif;font-size:28px;color:var(--ink);}
+.section-head p{font-size:14px;color:var(--ink3);margin-top:4px;}
+/* LEARN PAGE */
+.learn-tabs{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.learn-tab{padding:8px 18px;border-radius:20px;border:1.5px solid var(--border);background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:500;color:var(--ink2);transition:all 0.2s;}
+.learn-tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.concept-box{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:2rem;margin-bottom:1.5rem;}
+.concept-box h3{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:0.75rem;}
+.concept-def{font-size:15px;color:var(--ink2);line-height:1.7;margin-bottom:1.25rem;}
+.example-row{display:flex;gap:12px;flex-wrap:wrap;}
+.example-pill{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;}
+.example-pill strong{color:var(--accent);}
+.word-spectrum{background:var(--ink);border-radius:var(--r);padding:1.5rem;color:#fff;margin-top:1.5rem;}
+.spectrum-label{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:0.75rem;}
+.spectrum-bar{display:flex;align-items:center;gap:0;border-radius:8px;overflow:hidden;height:44px;}
+.spectrum-seg{flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;cursor:pointer;transition:filter 0.2s;}
+.spectrum-seg:hover{filter:brightness(1.15);}
+/* ACTIVITY PAGE */
+.activity-area{display:grid;grid-template-columns:300px 1fr;gap:1.5rem;align-items:start;}
+.activity-list{display:flex;flex-direction:column;gap:8px;}
+.activity-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;cursor:pointer;transition:all 0.2s;}
+.activity-item:hover,.activity-item.active{border-color:var(--accent);background:#fff8f5;}
+.activity-item.active .act-dot{background:var(--accent);}
+.act-dot{width:8px;height:8px;border-radius:50%;background:var(--border);display:inline-block;margin-right:8px;transition:background 0.2s;}
+.act-name-sm{font-size:13px;font-weight:500;}
+.act-desc-sm{font-size:11px;color:var(--ink3);margin-top:2px;}
+.activity-panel{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:2rem;min-height:420px;}
+/* CARD MATCH */
+.card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:1rem;}
+.vocab-card{height:80px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;transition:all 0.2s;user-select:none;text-align:center;padding:8px;}
+.vocab-card:hover{border-color:var(--accent3);background:#f0f5ff;}
+.vocab-card.selected{border-color:var(--accent);background:#fff2ec;color:var(--accent);}
+.vocab-card.matched{border-color:var(--accent2);background:#f0faf4;color:var(--accent2);cursor:default;}
+.vocab-card.wrong{border-color:#c0392b;background:#fff0ee;animation:shake 0.3s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);};}
+/* FILL BLANK */
+.fill-sentence{font-size:18px;line-height:2;margin:1rem 0;}
+.blank-input{border:none;border-bottom:2px solid var(--accent);background:transparent;font-size:18px;font-family:'DM Sans',sans-serif;width:140px;outline:none;color:var(--ink);padding:2px 4px;transition:border-color 0.2s;}
+.blank-input:focus{border-bottom-color:var(--accent3);}
+.blank-input.correct{border-bottom-color:var(--accent2);color:var(--accent2);}
+.blank-input.wrong{border-bottom-color:#c0392b;color:#c0392b;}
+/* WORD WEB */
+.web-canvas{position:relative;height:320px;background:var(--bg);border-radius:var(--r);overflow:hidden;margin-top:1rem;}
+.web-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--ink);color:#fff;border-radius:50%;width:90px;height:90px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;text-align:center;z-index:2;cursor:pointer;}
+.web-node{position:absolute;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;z-index:2;}
+.web-node:hover{transform:scale(1.05);}
+.web-line{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
+/* QUIZ PAGE */
+.quiz-progress{background:var(--surface2);border-radius:20px;height:6px;margin-bottom:2rem;overflow:hidden;}
+.quiz-progress-fill{height:100%;background:var(--accent);border-radius:20px;transition:width 0.4s ease;}
+.quiz-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:2rem;max-width:680px;margin:0 auto;}
+.q-num{font-size:12px;color:var(--ink3);font-weight:500;margin-bottom:0.5rem;}
+.q-text{font-family:'DM Serif Display',serif;font-size:22px;line-height:1.3;margin-bottom:1.5rem;color:var(--ink);}
+.q-opts{display:flex;flex-direction:column;gap:10px;}
+.q-opt{padding:14px 18px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:14px;transition:all 0.2s;font-family:'DM Sans',sans-serif;text-align:left;}
+.q-opt:hover{border-color:var(--accent3);background:#f5f8ff;}
+.q-opt.selected{border-color:var(--accent3);background:#f5f8ff;}
+.q-opt.correct{border-color:var(--accent2);background:#f0faf4;color:var(--accent2);font-weight:500;}
+.q-opt.wrong{border-color:#c0392b;background:#fff0ee;color:#c0392b;}
+.fill-q-input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);outline:none;transition:border-color 0.2s;}
+.fill-q-input:focus{border-color:var(--accent3);}
+.fill-q-input.correct{border-color:var(--accent2);background:#f0faf4;}
+.fill-q-input.wrong{border-color:#c0392b;background:#fff0ee;}
+.q-feedback{font-size:13px;margin-top:8px;min-height:20px;}
+.q-feedback.good{color:var(--accent2);}
+.q-feedback.bad{color:#c0392b;}
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;}
+/* RESULTS */
+.result-wrap{max-width:640px;margin:0 auto;text-align:center;padding:2rem;}
+.result-circle{width:140px;height:140px;border-radius:50%;margin:0 auto 1.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid var(--accent);}
+.result-score{font-family:'DM Serif Display',serif;font-size:48px;color:var(--ink);}
+.result-grade{font-size:13px;font-weight:600;color:var(--ink3);}
+.result-msg{font-size:15px;color:var(--ink2);line-height:1.7;margin-bottom:1.5rem;}
+.missed-list{text-align:left;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1.5rem;}
+.missed-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--ink2);}
+.missed-item:last-child{border-bottom:none;}
+.missed-item strong{color:var(--ink);}
+.missed-item .correct-ans{color:var(--accent2);font-weight:500;}
+/* TRACKER PAGE */
+.tracker-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;}
+.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.5rem;text-align:center;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:40px;color:var(--accent);}
+.stat-label{font-size:12px;color:var(--ink3);font-weight:500;margin-top:4px;}
+.week-timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+.week-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;}
+.week-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;}
+.week-title{font-size:13px;font-weight:600;color:var(--ink);}
+.week-status{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.week-tasks{display:flex;flex-direction:column;gap:6px;}
+.week-task{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);}
+.task-check{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;}
+.task-check.done{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+/* MISC */
+.tag{display:inline-block;font-size:11px;padding:2px 10px;border-radius:20px;font-weight:600;}
+.tag-syn{background:#e8f4ee;color:#2a6b4a;}
+.tag-ant{background:#fef0e8;color:#d4500a;}
+.divider{height:1px;background:var(--border);margin:1.5rem 0;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;}
+.empty-state{text-align:center;padding:3rem;color:var(--ink3);}
+.empty-state .empty-icon{font-size:48px;margin-bottom:1rem;}
+.score-strip{display:flex;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.score-chip{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;text-align:center;flex:1;min-width:100px;}
+.score-chip-num{font-size:22px;font-weight:600;color:var(--ink);}
+.score-chip-label{font-size:11px;color:var(--ink3);}
+input[type=range]{width:100%;accent-color:var(--accent);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+/* Responsive */
+@media(max-width:700px){
+  .hero{grid-template-columns:1fr;}
+  .activity-area{grid-template-columns:1fr;}
+  .week-timeline{grid-template-columns:1fr 1fr;}
+  .card-grid{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Vocab<span>Play</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('home')">Home</button>
+    <button class="nav-tab" onclick="showPage('learn')">Learn</button>
+    <button class="nav-tab" onclick="showPage('activities')">Activities</button>
+    <button class="nav-tab" onclick="showPage('quiz')">Quiz</button>
+    <button class="nav-tab" onclick="showPage('tracker')">Progress</button>
+  </div>
+  <div class="nav-right">
+    <div class="progress-pill" id="navScore">Score: 0 pts</div>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div>
+      <div class="hero-title">Master <em>Synonyms</em> &amp; Antonyms</div>
+      <div class="hero-sub">A complete 4-week classroom journey from concept to mastery — activities, games, quizzes, and real-time progress tracking.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="showPage('learn')">Start Learning</button>
+        <button class="btn-secondary" onclick="showPage('activities')">Try an Activity</button>
+      </div>
+    </div>
+    <div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Activities</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">Quiz Questions</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">4</div><div class="hero-stat-label">Week Plan</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">Skill Levels</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head"><h2>Your Learning Modules</h2><p>Work through each module in sequence for the best results.</p></div>
+  <div class="modules-grid">
+    <div class="module-card" onclick="showPage('learn')">
+      <div class="module-icon" style="background:#fff0e8;">📖</div>
+      <div class="module-title">Concept Lessons</div>
+      <div class="module-desc">Clear explanations of synonyms and antonyms with visual examples and a word spectrum.</div>
+      <span class="module-badge" style="background:#fff0e8;color:#d4500a;">Week 1</span>
+    </div>
+    <div class="module-card" onclick="showActivity('cardmatch')">
+      <div class="module-icon" style="background:#f0faf4;">🃏</div>
+      <div class="module-title">Card Match Game</div>
+      <div class="module-desc">Match synonym and antonym pairs against the clock. Earns points!</div>
+      <span class="module-badge" style="background:#f0faf4;color:#2a6b4a;">Week 2</span>
+    </div>
+    <div class="module-card" onclick="showActivity('fillblank')">
+      <div class="module-icon" style="background:#f0f5ff;">✍️</div>
+      <div class="module-title">Fill in the Blank</div>
+      <div class="module-desc">Complete sentences by choosing the correct synonym or antonym.</div>
+      <span class="module-badge" style="background:#f0f5ff;color:#3a5a8a;">Week 2</span>
+    </div>
+    <div class="module-card" onclick="showActivity('wordweb')">
+      <div class="module-icon" style="background:#fef8e8;">🕸️</div>
+      <div class="module-title">Word Web Builder</div>
+      <div class="module-desc">Build visual webs around root words, connecting synonyms and antonyms.</div>
+      <span class="module-badge" style="background:#fef8e8;color:#c8960a;">Week 3</span>
+    </div>
+    <div class="module-card" onclick="showPage('quiz')">
+      <div class="module-icon" style="background:#fff0e8;">📝</div>
+      <div class="module-title">End-of-Unit Quiz</div>
+      <div class="module-desc">10-question adaptive quiz with instant scoring and personalised feedback.</div>
+      <span class="module-badge" style="background:#fff0e8;color:#d4500a;">Week 4</span>
+    </div>
+    <div class="module-card" onclick="showPage('tracker')">
+      <div class="module-icon" style="background:#f0faf4;">📊</div>
+      <div class="module-title">Progress Tracker</div>
+      <div class="module-desc">Monitor your milestones, scores, and completed tasks across all 4 weeks.</div>
+      <span class="module-badge" style="background:#f0faf4;color:#2a6b4a;">All Weeks</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-head"><h2>Objectives</h2><p>What you'll achieve by the end of this unit.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1rem;">
+      <div style="font-size:20px;margin-bottom:6px;">🎯</div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px;">Define both concepts</div>
+      <div style="font-size:12px;color:var(--ink3);">Accurately explain synonyms and antonyms with original examples.</div>
+    </div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1rem;">
+      <div style="font-size:20px;margin-bottom:6px;">🔍</div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px;">Identify in context</div>
+      <div style="font-size:12px;color:var(--ink3);">Spot and classify word relationships in reading and writing.</div>
+    </div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1rem;">
+      <div style="font-size:20px;margin-bottom:6px;">💬</div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px;">Apply in writing</div>
+      <div style="font-size:12px;color:var(--ink3);">Use synonyms to improve word variety and avoid repetition.</div>
+    </div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1rem;">
+      <div style="font-size:20px;margin-bottom:6px;">📈</div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px;">Measurable progress</div>
+      <div style="font-size:12px;color:var(--ink3);">All learner levels show growth by end of Week 4.</div>
+    </div>
+  </div>
+</div>
+
+<!-- LEARN PAGE -->
+<div class="page" id="page-learn">
+  <div class="section-head"><h2>Concept Lessons</h2><p>Choose your topic to explore.</p></div>
+  <div class="learn-tabs">
+    <button class="learn-tab active" onclick="learnTab('synonyms',this)">Synonyms</button>
+    <button class="learn-tab" onclick="learnTab('antonyms',this)">Antonyms</button>
+    <button class="learn-tab" onclick="learnTab('spectrum',this)">Word Spectrum</button>
+    <button class="learn-tab" onclick="learnTab('tips',this)">Study Tips</button>
+  </div>
+
+  <div id="learn-synonyms">
+    <div class="concept-box">
+      <h3>What are Synonyms?</h3>
+      <div class="concept-def">A <strong>synonym</strong> is a word that has a <em>similar or the same meaning</em> as another word. Using synonyms makes your writing richer and avoids repetition. They can differ in formality, intensity, or nuance — so choosing the right one matters!</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;"><span class="tag tag-syn">SYN</span><span style="font-size:13px;color:var(--ink3);">Examples of synonym groups:</span></div>
+      <div class="example-row">
+        <div class="example-pill"><strong>Happy</strong> → joyful, cheerful, content, pleased, elated</div>
+        <div class="example-pill"><strong>Big</strong> → large, huge, enormous, vast, massive</div>
+        <div class="example-pill"><strong>Walk</strong> → stroll, wander, march, stride, amble</div>
+        <div class="example-pill"><strong>Smart</strong> → intelligent, clever, bright, sharp, astute</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.5rem;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:1rem;">Intensity matters with synonyms</div>
+      <div style="display:flex;align-items:center;gap:0;border-radius:8px;overflow:hidden;">
+        <div style="flex:1;background:#e8f0ff;padding:12px;text-align:center;font-size:12px;"><div style="font-weight:500;">Content</div><div style="color:var(--ink3);font-size:11px;">mild</div></div>
+        <div style="flex:1;background:#d0e4ff;padding:12px;text-align:center;font-size:12px;"><div style="font-weight:500;">Happy</div><div style="color:var(--ink3);font-size:11px;">moderate</div></div>
+        <div style="flex:1;background:#b8d6ff;padding:12px;text-align:center;font-size:12px;"><div style="font-weight:500;">Joyful</div><div style="color:var(--ink3);font-size:11px;">strong</div></div>
+        <div style="flex:1;background:#3a5a8a;padding:12px;text-align:center;font-size:12px;color:#fff;"><div style="font-weight:500;">Ecstatic</div><div style="font-size:11px;opacity:0.7;">intense</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="learn-antonyms" style="display:none;">
+    <div class="concept-box">
+      <h3>What are Antonyms?</h3>
+      <div class="concept-def">An <strong>antonym</strong> is a word that means the <em>opposite</em> of another word. There are three types: <strong>gradable</strong> (hot/cold — there are degrees), <strong>complementary</strong> (alive/dead — no middle ground), and <strong>relational</strong> (teacher/student — each defines the other).</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;"><span class="tag tag-ant">ANT</span><span style="font-size:13px;color:var(--ink3);">Antonym pairs:</span></div>
+      <div class="example-row">
+        <div class="example-pill"><strong>Hot</strong> ↔ Cold <span style="color:var(--ink3);font-size:11px;">(gradable)</span></div>
+        <div class="example-pill"><strong>Alive</strong> ↔ Dead <span style="color:var(--ink3);font-size:11px;">(complementary)</span></div>
+        <div class="example-pill"><strong>Buy</strong> ↔ Sell <span style="color:var(--ink3);font-size:11px;">(relational)</span></div>
+        <div class="example-pill"><strong>Love</strong> ↔ Hate <span style="color:var(--ink3);font-size:11px;">(gradable)</span></div>
+        <div class="example-pill"><strong>Dark</strong> ↔ Light <span style="color:var(--ink3);font-size:11px;">(gradable)</span></div>
+      </div>
+    </div>
+    <div style="background:var(--ink);border-radius:var(--r);padding:1.5rem;color:#fff;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:1rem;">Quick Check — Are these antonyms or synonyms?</div>
+      <div id="quickcheck" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+
+  <div id="learn-spectrum" style="display:none;">
+    <div class="concept-box">
+      <h3>The Emotion Word Spectrum</h3>
+      <div class="concept-def">Words exist on a spectrum. Antonyms anchor the two extremes, while synonyms cluster in between — each with slightly different intensity or nuance. Click a colour to see the word.</div>
+    </div>
+    <div id="spectrumDisplay" style="background:var(--ink);border-radius:var(--r);padding:1.5rem;color:#fff;margin-top:1rem;">
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:1rem;">Happiness Spectrum — from extreme to extreme:</div>
+      <div class="spectrum-bar" id="spectrumBar"></div>
+      <div id="spectrumInfo" style="margin-top:1rem;font-size:14px;min-height:40px;"></div>
+    </div>
+  </div>
+
+  <div id="learn-tips" style="display:none;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;">
+      <div class="concept-box"><h3 style="font-size:18px;">🔤 Use a Thesaurus</h3><div class="concept-def" style="font-size:13px;">When writing, keep a thesaurus handy. Look up your most-used words and find 2–3 alternatives with different intensities.</div></div>
+      <div class="concept-box"><h3 style="font-size:18px;">🃏 Flashcard Drilling</h3><div class="concept-def" style="font-size:13px;">Write a word on one side and its synonyms/antonyms on the other. Review 10 cards daily for best retention.</div></div>
+      <div class="concept-box"><h3 style="font-size:18px;">📝 Story Rewriting</h3><div class="concept-def" style="font-size:13px;">Take a paragraph you've written and replace 3 words with synonyms. Notice how the tone can shift even when meaning stays similar.</div></div>
+      <div class="concept-box"><h3 style="font-size:18px;">🕸️ Word Web Thinking</h3><div class="concept-def" style="font-size:13px;">For every new word you learn, draw a mini web: the word in the middle, synonyms on the left, antonyms on the right.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVITIES PAGE -->
+<div class="page" id="page-activities">
+  <div class="section-head"><h2>Activities</h2><p>Choose an activity to practise your skills.</p></div>
+  <div class="activity-area">
+    <div class="activity-list">
+      <div class="activity-item active" id="act-btn-cardmatch" onclick="showActivity('cardmatch')">
+        <span class="act-dot"></span><div class="act-name-sm">🃏 Card Match</div><div class="act-desc-sm">Match synonym/antonym pairs</div>
+      </div>
+      <div class="activity-item" id="act-btn-fillblank" onclick="showActivity('fillblank')">
+        <span class="act-dot"></span><div class="act-name-sm">✍️ Fill the Blank</div><div class="act-desc-sm">Complete sentences with the right word</div>
+      </div>
+      <div class="activity-item" id="act-btn-wordweb" onclick="showActivity('wordweb')">
+        <span class="act-dot"></span><div class="act-name-sm">🕸️ Word Web</div><div class="act-desc-sm">Build visual word networks</div>
+      </div>
+      <div class="activity-item" id="act-btn-oppositeday" onclick="showActivity('oppositeday')">
+        <span class="act-dot"></span><div class="act-name-sm">🎲 Opposite Day</div><div class="act-desc-sm">Type the antonym as fast as you can</div>
+      </div>
+    </div>
+    <div class="activity-panel" id="activityPanel">
+      <div class="empty-state"><div class="empty-icon">🃏</div><p>Loading activity...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div class="page" id="page-quiz">
+  <div class="section-head"><h2>End-of-Unit Quiz</h2><p>10 questions · synonyms, antonyms, and context · instant feedback</p></div>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressBar" style="width:0%"></div></div>
+  <div id="quizContent"></div>
+</div>
+
+<!-- PROGRESS TRACKER PAGE -->
+<div class="page" id="page-tracker">
+  <div class="section-head"><h2>Progress Tracker</h2><p>Your 4-week learning journey at a glance.</p></div>
+  <div class="tracker-grid" id="trackerStats"></div>
+  <div class="section-head" style="margin-top:1rem;"><h2 style="font-size:22px;">4-Week Milestone Plan</h2></div>
+  <div class="week-timeline" id="weekTimeline"></div>
+  <div class="divider"></div>
+  <div class="section-head"><h2 style="font-size:22px;">Assessment Methods</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;"><div style="font-size:18px;margin-bottom:6px;">📋</div><div style="font-size:13px;font-weight:600;margin-bottom:4px;">Daily Exit Tickets</div><div style="font-size:12px;color:var(--ink3);">3 quick questions at lesson end. Formative check-in every session.</div></div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;"><div style="font-size:18px;margin-bottom:6px;">🤝</div><div style="font-size:13px;font-weight:600;margin-bottom:4px;">Peer Review</div><div style="font-size:12px;color:var(--ink3);">Students swap story rewrites and evaluate with a shared checklist.</div></div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;"><div style="font-size:18px;margin-bottom:6px;">🎯</div><div style="font-size:13px;font-weight:600;margin-bottom:4px;">Observation Rubric</div><div style="font-size:12px;color:var(--ink3);">Teacher scores game participation on accuracy, speed, confidence (1–4).</div></div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;"><div style="font-size:18px;margin-bottom:6px;">📝</div><div style="font-size:13px;font-weight:600;margin-bottom:4px;">End-of-Unit Test</div><div style="font-size:12px;color:var(--ink3);">Written + contextual. Differentiated: foundational / standard / extended.</div></div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;"><div style="font-size:18px;margin-bottom:6px;">🗂️</div><div style="font-size:13px;font-weight:600;margin-bottom:4px;">Portfolio Entry</div><div style="font-size:12px;color:var(--ink3);">Each student submits a self-selected word web as evidence of independent thinking.</div></div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────
+const state = {
+  points: parseInt(localStorage.getItem('ww_points')||'0'),
+  quizScore: parseInt(localStorage.getItem('ww_quizScore')||'0'),
+  quizDone: localStorage.getItem('ww_quizDone')==='1',
+  activitiesDone: parseInt(localStorage.getItem('ww_actDone')||'0'),
+  tasks: JSON.parse(localStorage.getItem('ww_tasks')||'{}')
+};
+function saveState(){ localStorage.setItem('ww_points',state.points); localStorage.setItem('ww_quizScore',state.quizScore); localStorage.setItem('ww_quizDone',state.quizDone?'1':'0'); localStorage.setItem('ww_actDone',state.activitiesDone); localStorage.setItem('ww_tasks',JSON.stringify(state.tasks)); }
+function addPoints(n){ state.points+=n; saveState(); document.getElementById('navScore').textContent='Score: '+state.points+' pts'; showToast('+'+n+' points!'); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+
+// ── Navigation ─────────────────────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const map={home:0,learn:1,activities:2,quiz:3,tracker:4};
+  document.querySelectorAll('.nav-tab')[map[id]].classList.add('active');
+  if(id==='activities') showActivity('cardmatch');
+  if(id==='quiz') initQuiz();
+  if(id==='tracker') renderTracker();
+  if(id==='learn') initSpectrum();
+}
+
+// ── LEARN ──────────────────────────────────────────────────────────
+function learnTab(name,btn){
+  ['synonyms','antonyms','spectrum','tips'].forEach(t=>document.getElementById('learn-'+t).style.display='none');
+  document.getElementById('learn-'+name).style.display='block';
+  document.querySelectorAll('.learn-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(name==='antonyms') renderQuickCheck();
+  if(name==='spectrum') initSpectrum();
+}
+function renderQuickCheck(){
+  const pairs=[['Hot','Cold','ant'],['Smart','Intelligent','syn'],['Fast','Slow','ant'],['Brave','Courageous','syn'],['Dark','Light','ant']];
+  const el=document.getElementById('quickcheck'); el.innerHTML='';
+  pairs.forEach(([a,b,type])=>{
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border-radius:8px;padding:10px 14px;';
+    div.innerHTML=`<span style="font-size:14px;">${a} &harr; ${b}</span><button onclick="checkQC(this,'${type}')" style="background:rgba(255,255,255,0.12);border:none;color:#fff;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;" data-ans="${type}">Antonym?</button>`;
+    el.appendChild(div);
+  });
+}
+function checkQC(btn,type){
+  if(btn.dataset.clicked) return;
+  btn.dataset.clicked='1';
+  if(type==='ant'){ btn.textContent='✓ Antonym'; btn.style.background='rgba(42,107,74,0.5)'; addPoints(2); }
+  else { btn.textContent='✗ Synonym!'; btn.style.background='rgba(192,57,43,0.5)'; }
+}
+
+const spectrumWords=[
+  {w:'Miserable',c:'#8a2020'},
+  {w:'Sad',c:'#b03030'},
+  {w:'Unhappy',c:'#c84040'},
+  {w:'Neutral',c:'#888'},
+  {w:'Okay',c:'#4a8a4a'},
+  {w:'Happy',c:'#2a7a2a'},
+  {w:'Joyful',c:'#1a6a1a'},
+  {w:'Ecstatic',c:'#0d5a0d'}
+];
+function initSpectrum(){
+  const bar=document.getElementById('spectrumBar'); if(!bar) return; bar.innerHTML='';
+  spectrumWords.forEach((sw,i)=>{
+    const seg=document.createElement('div');
+    seg.className='spectrum-seg';
+    seg.style.cssText=`background:${sw.c};color:#fff;font-size:11px;padding:4px 2px;text-align:center;`;
+    seg.textContent=sw.w;
+    seg.onclick=()=>{ document.getElementById('spectrumInfo').innerHTML=`<strong>${sw.w}</strong> — ${i<3?'antonym anchor (negative)':i===3?'neutral midpoint':i>5?'antonym anchor (positive)':'synonym cluster (positive)'}. <span style="opacity:0.7;font-size:12px;">${i===0||i===7?'Extreme antonym end.':'Part of the synonym group around "happy".'}</span>`; };
+    bar.appendChild(seg);
+  });
+}
+
+// ── ACTIVITIES ─────────────────────────────────────────────────────
+function showActivity(name){
+  document.querySelectorAll('.activity-item').forEach(i=>i.classList.remove('active'));
+  const btn=document.getElementById('act-btn-'+name); if(btn) btn.classList.add('active');
+  const panel=document.getElementById('activityPanel');
+  if(name==='cardmatch') renderCardMatch(panel);
+  else if(name==='fillblank') renderFillBlank(panel);
+  else if(name==='wordweb') renderWordWeb(panel);
+  else if(name==='oppositeday') renderOppositeDay(panel);
+  showPage('activities');
+}
+
+// Card Match
+const cardPairs=[
+  {a:'Happy',b:'Joyful',type:'syn'},{a:'Big',b:'Large',type:'syn'},{a:'Fast',b:'Quick',type:'syn'},{a:'Smart',b:'Clever',type:'syn'},
+  {a:'Hot',b:'Cold',type:'ant'},{a:'Day',b:'Night',type:'ant'},{a:'Love',b:'Hate',type:'ant'},{a:'Strong',b:'Weak',type:'ant'}
+];
+let cmState={selected:null,matched:[],wrong:null,score:0,set:[]};
+function renderCardMatch(panel){
+  cmState={selected:null,matched:[],wrong:null,score:0,set:[]};
+  const chosen=shuffle([...cardPairs]).slice(0,4);
+  chosen.forEach(p=>{ cmState.set.push({id:p.a+'_a',word:p.a,pair:p.b+'_b',type:p.type}); cmState.set.push({id:p.b+'_b',word:p.b,pair:p.a+'_a',type:p.type}); });
+  cmState.set=shuffle(cmState.set);
+  panel.innerHTML=`
+    <div class="flex-between" style="margin-bottom:1rem;"><div><h3 style="font-size:18px;font-family:'DM Serif Display',serif;">Card Match</h3><p style="font-size:12px;color:var(--ink3);">Click two cards that are a synonym or antonym pair.</p></div><div id="cmScore" style="font-size:18px;font-weight:600;color:var(--accent);">0 matched</div></div>
+    <div class="card-grid" id="cmGrid"></div>
+    <div style="margin-top:1rem;font-size:13px;color:var(--ink3);" id="cmMsg"></div>
+  `;
+  const grid=document.getElementById('cmGrid');
+  cmState.set.forEach(c=>{
+    const card=document.createElement('div');
+    card.className='vocab-card'; card.id='card-'+c.id;
+    card.textContent=c.word;
+    card.dataset.type=c.type;
+    card.onclick=()=>selectCard(c.id, c.pair, c.word, c.type);
+    grid.appendChild(card);
+  });
+}
+function selectCard(id,pair,word,type){
+  if(cmState.matched.includes(id)||id===cmState.selected) return;
+  const el=document.getElementById('card-'+id);
+  if(cmState.selected===null){
+    cmState.selected=id; el.classList.add('selected');
+  } else {
+    const prevEl=document.getElementById('card-'+cmState.selected);
+    const prevPair=cmState.set.find(c=>c.id===cmState.selected).pair;
+    if(prevPair===id){
+      el.classList.add('matched'); prevEl.classList.remove('selected'); prevEl.classList.add('matched');
+      cmState.matched.push(id,cmState.selected);
+      cmState.score++;
+      document.getElementById('cmScore').textContent=cmState.score+' matched';
+      document.getElementById('cmMsg').textContent='✓ Correct! That pair is a '+type+'!';
+      addPoints(5);
+      if(cmState.score===4){ setTimeout(()=>{ document.getElementById('cmMsg').textContent='🎉 All matched! Great work!'; state.activitiesDone++; saveState(); },400); }
+    } else {
+      el.classList.add('wrong'); prevEl.classList.add('wrong');
+      document.getElementById('cmMsg').textContent='✗ Not a pair — try again!';
+      setTimeout(()=>{ el.classList.remove('wrong','selected'); prevEl.classList.remove('wrong','selected'); },700);
+    }
+    cmState.selected=null;
+  }
+}
+
+// Fill Blank
+const fbSentences=[
+  {sentence:'The weather was very ____ today.',word:'hot',answer:'cold',type:'ant',hint:'Antonym of hot'},
+  {sentence:'She was ____ about winning the prize.',word:'happy',answer:'joyful',type:'syn',hint:'Synonym of happy'},
+  {sentence:'The cat was ____ unlike the slow turtle.',word:'slow',answer:'fast',type:'ant',hint:'Antonym of slow'},
+  {sentence:'He was ____ and knowledgeable about history.',word:'smart',answer:'intelligent',type:'syn',hint:'Synonym of smart'},
+  {sentence:'The room was ____, not bright at all.',word:'bright',answer:'dark',type:'ant',hint:'Antonym of bright'},
+];
+let fbIdx=0, fbScore=0;
+function renderFillBlank(panel){
+  fbIdx=0; fbScore=0;
+  panel.innerHTML=`<h3 style="font-size:18px;font-family:'DM Serif Display',serif;margin-bottom:0.5rem;">Fill in the Blank</h3><p style="font-size:12px;color:var(--ink3);margin-bottom:1.5rem;">Complete each sentence with a synonym or antonym as instructed.</p><div id="fbContent"></div>`;
+  renderFBQuestion();
+}
+function renderFBQuestion(){
+  if(fbIdx>=fbSentences.length){ document.getElementById('fbContent').innerHTML=`<div style="text-align:center;padding:2rem;"><div style="font-size:40px;margin-bottom:1rem;">🎉</div><div style="font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:0.5rem;">Complete!</div><div style="font-size:14px;color:var(--ink3);">Score: ${fbScore}/${fbSentences.length}</div><button class="btn-primary" style="margin-top:1rem;" onclick="renderFillBlank(document.getElementById('activityPanel'))">Try Again</button></div>`; state.activitiesDone++; saveState(); return; }
+  const s=fbSentences[fbIdx];
+  const tag=s.type==='syn'?'<span class="tag tag-syn" style="font-size:11px;">SYNONYM</span>':'<span class="tag tag-ant" style="font-size:11px;">ANTONYM</span>';
+  document.getElementById('fbContent').innerHTML=`
+    <div style="margin-bottom:1rem;">${tag} <span style="font-size:12px;color:var(--ink3);">Question ${fbIdx+1} of ${fbSentences.length} — ${s.hint}</span></div>
+    <div class="fill-sentence">${s.sentence.replace('____','<input class="blank-input" id="fbInput" placeholder="type here..." />')}</div>
+    <button class="btn-primary" style="margin-top:1rem;" onclick="checkFB()">Check Answer</button>
+    <div id="fbFeedback" style="font-size:13px;margin-top:8px;min-height:20px;"></div>
+  `;
+  document.getElementById('fbInput').focus();
+  document.getElementById('fbInput').onkeydown=e=>{ if(e.key==='Enter') checkFB(); };
+}
+function checkFB(){
+  const s=fbSentences[fbIdx];
+  const val=(document.getElementById('fbInput').value||'').trim().toLowerCase();
+  const fb=document.getElementById('fbFeedback');
+  const inp=document.getElementById('fbInput');
+  if(val===s.answer||val===s.word){
+    inp.classList.add('correct'); fb.style.color='var(--accent2)'; fb.textContent='✓ Correct! "'+s.answer+'" is the '+s.type+'.';
+    fbScore++; addPoints(3);
+  } else {
+    inp.classList.add('wrong'); fb.style.color='#c0392b'; fb.textContent='✗ The answer was "'+s.answer+'" ('+s.type+' of "'+s.word+'")';
+  }
+  setTimeout(()=>{ fbIdx++; renderFBQuestion(); },1500);
+}
+
+// Word Web
+const webWords=['Brave','Happy','Strong','Fast','Kind'];
+let wwWord='';
+function renderWordWeb(panel){
+  const ww=webWords[Math.floor(Math.random()*webWords.length)];
+  wwWord=ww;
+  const webData={
+    Brave:{syn:['Courageous','Bold','Fearless'],ant:['Cowardly','Timid','Afraid']},
+    Happy:{syn:['Joyful','Cheerful','Content'],ant:['Sad','Miserable','Gloomy']},
+    Strong:{syn:['Powerful','Mighty','Robust'],ant:['Weak','Frail','Feeble']},
+    Fast:{syn:['Quick','Swift','Rapid'],ant:['Slow','Sluggish','Leisurely']},
+    Kind:{syn:['Gentle','Caring','Generous'],ant:['Cruel','Harsh','Unkind']}
+  };
+  const data=webData[ww];
+  panel.innerHTML=`
+    <div class="flex-between" style="margin-bottom:1rem;">
+      <div><h3 style="font-size:18px;font-family:'DM Serif Display',serif;">Word Web: "${ww}"</h3><p style="font-size:12px;color:var(--ink3);">Green = Synonyms &nbsp;|&nbsp; Orange = Antonyms. Click a node to learn more.</p></div>
+      <button class="btn-secondary" onclick="renderWordWeb(document.getElementById('activityPanel'))">New Word</button>
+    </div>
+    <div class="web-canvas" id="wwCanvas">
+      <svg class="web-line" id="wwSvg"></svg>
+      <div class="web-center" id="wwCenter">${ww}</div>
+    </div>
+    <div id="wwInfo" style="margin-top:1rem;font-size:13px;color:var(--ink3);text-align:center;"></div>
+  `;
+  setTimeout(()=>{
+    const canvas=document.getElementById('wwCanvas');
+    const cw=canvas.offsetWidth, ch=canvas.offsetHeight;
+    const cx=cw/2, cy=ch/2;
+    const allNodes=[];
+    data.syn.forEach((w,i)=>allNodes.push({w,type:'syn',angle:-60+i*60}));
+    data.ant.forEach((w,i)=>allNodes.push({w,type:'ant',angle:120+i*60}));
+    const svg=document.getElementById('wwSvg');
+    svg.innerHTML='';
+    allNodes.forEach(n=>{
+      const rad=n.angle*(Math.PI/180);
+      const r=110;
+      const nx=cx+r*Math.cos(rad), ny=cy+r*Math.sin(rad);
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',cx); line.setAttribute('y1',cy); line.setAttribute('x2',nx); line.setAttribute('y2',ny);
+      line.setAttribute('stroke', n.type==='syn'?'#2a6b4a':'#d4500a'); line.setAttribute('stroke-width','1.5'); line.setAttribute('stroke-dasharray','4');
+      svg.appendChild(line);
+      const node=document.createElement('div');
+      node.className='web-node';
+      node.style.cssText=`left:${nx-40}px;top:${ny-18}px;background:${n.type==='syn'?'#e8f5ee':'#fff0e8'};color:${n.type==='syn'?'#2a6b4a':'#d4500a'};border:1.5px solid ${n.type==='syn'?'#9ad4b4':'#f0a060'};`;
+      node.textContent=n.w;
+      node.onclick=()=>{ document.getElementById('wwInfo').textContent='"'+n.w+'" is a '+(n.type==='syn'?'synonym':'antonym')+' of "'+ww+'".'; addPoints(1); };
+      canvas.appendChild(node);
+    });
+    addPoints(2);
+    state.activitiesDone++; saveState();
+  },100);
+}
+
+// Opposite Day
+const odWords=[['Happy','Sad'],['Big','Small'],['Hot','Cold'],['Fast','Slow'],['Light','Dark'],['Strong','Weak'],['Loud','Quiet'],['Old','Young']];
+let odCurrent=null, odScore=0, odTimer=null, odTimeLeft=0;
+function renderOppositeDay(panel){
+  odScore=0;
+  panel.innerHTML=`<h3 style="font-size:18px;font-family:'DM Serif Display',serif;margin-bottom:0.5rem;">Opposite Day!</h3><p style="font-size:12px;color:var(--ink3);margin-bottom:1.5rem;">Type the antonym of the word shown as quickly as possible. You have 30 seconds!</p><div id="odContent"></div>`;
+  startOD();
+}
+function startOD(){
+  odScore=0; odTimeLeft=30;
+  document.getElementById('odContent').innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:1rem;"><div style="font-size:24px;font-weight:600;color:var(--accent);" id="odTimeDisplay">30s</div><div style="font-size:16px;font-weight:500;" id="odScoreDisplay">Score: 0</div></div><div style="text-align:center;padding:2rem;background:var(--ink);border-radius:var(--r);color:#fff;margin-bottom:1rem;"><div style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:0.5rem;">What is the ANTONYM of:</div><div style="font-family:'DM Serif Display',serif;font-size:48px;" id="odWord">—</div></div><input class="fill-q-input" id="odInput" placeholder="Type antonym here and press Enter..." /><div id="odFeedback" style="font-size:13px;margin-top:8px;min-height:20px;text-align:center;"></div>`;
+  document.getElementById('odInput').onkeydown=e=>{ if(e.key==='Enter') checkOD(); };
+  nextODWord();
+  odTimer=setInterval(()=>{
+    odTimeLeft--;
+    document.getElementById('odTimeDisplay').textContent=odTimeLeft+'s';
+    if(odTimeLeft<=0){ clearInterval(odTimer); endOD(); }
+  },1000);
+}
+function nextODWord(){
+  odCurrent=odWords[Math.floor(Math.random()*odWords.length)];
+  document.getElementById('odWord').textContent=odCurrent[0];
+  const inp=document.getElementById('odInput'); inp.value=''; inp.classList.remove('correct','wrong'); inp.focus();
+}
+function checkOD(){
+  const val=(document.getElementById('odInput').value||'').trim().toLowerCase();
+  const fb=document.getElementById('odFeedback'); const inp=document.getElementById('odInput');
+  if(val===odCurrent[1].toLowerCase()){
+    inp.classList.add('correct'); fb.style.color='var(--accent2)'; fb.textContent='✓ Correct!';
+    odScore++; document.getElementById('odScoreDisplay').textContent='Score: '+odScore;
+    setTimeout(nextODWord,500);
+  } else {
+    inp.classList.add('wrong'); fb.style.color='#c0392b'; fb.textContent='✗ Answer: '+odCurrent[1];
+    setTimeout(nextODWord,800);
+  }
+}
+function endOD(){
+  addPoints(odScore*3); state.activitiesDone++; saveState();
+  document.getElementById('odContent').innerHTML=`<div style="text-align:center;padding:2rem;"><div style="font-size:48px;margin-bottom:1rem;">⏱️</div><div style="font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:0.5rem;">Time's up!</div><div style="font-size:15px;color:var(--ink2);margin-bottom:1.5rem;">You got <strong>${odScore}</strong> correct antonyms!</div><button class="btn-primary" onclick="renderOppositeDay(document.getElementById('activityPanel'))">Play Again</button></div>`;
+}
+
+// ── QUIZ ───────────────────────────────────────────────────────────
+const quizQuestions=[
+  {type:'mcq',tag:'SYNONYMS',q:'Which word is a synonym for "happy"?',opts:['Sad','Joyful','Angry','Tired'],ans:1},
+  {type:'mcq',tag:'ANTONYMS',q:'What is the antonym of "ancient"?',opts:['Old','Historic','Modern','Large'],ans:2},
+  {type:'mcq',tag:'SYNONYMS',q:'Which pair are synonyms?',opts:['Big — Large','Hot — Cold','Fast — Slow','Day — Night'],ans:0},
+  {type:'mcq',tag:'ANTONYMS',q:'Which pair are antonyms?',opts:['Quick — Speedy','Brave — Courageous','Smart — Intelligent','Loud — Quiet'],ans:3},
+  {type:'fill',tag:'ANTONYMS',q:'Write an antonym for the word "friend":',ans:['enemy','foe','rival']},
+  {type:'fill',tag:'SYNONYMS',q:'Write a synonym for the word "fast":',ans:['quick','speedy','swift','rapid']},
+  {type:'mcq',tag:'CONTEXT',q:'In "The movie was dull," which synonym best replaces "dull"?',opts:['Exciting','Boring','Bright','Loud'],ans:1},
+  {type:'mcq',tag:'DEFINITION',q:'What is the correct definition of an antonym?',opts:['A word that sounds the same but means something different','A word with a very similar meaning to another word','A word that means the opposite of another word','A word that is spelled differently but means the same'],ans:2},
+  {type:'fill',tag:'SYNONYMS',q:'Write a synonym for "difficult":',ans:['hard','tough','challenging','complex']},
+  {type:'mcq',tag:'ADVANCED',q:'Which sentence uses a synonym correctly to improve vocabulary variety?',opts:['"The scholar was intelligent" replacing "The scholar was smart"','"The dog was cold" replacing "The dog was warm"','"She was sad" replacing "She was happy"','"He ran slowly" replacing "He ran fast"'],ans:0}
+];
+let qzIdx=0, qzAnswers=[], qzAnswered=false;
+function initQuiz(){
+  if(state.quizDone){ showQuizResults(state.quizScore); return; }
+  qzIdx=0; qzAnswers=[]; qzAnswered=false;
+  renderQuizQuestion();
+}
+function updateQBar(){ document.getElementById('quizProgressBar').style.width=((qzIdx/quizQuestions.length)*100)+'%'; }
+function renderQuizQuestion(){
+  updateQBar();
+  const q=quizQuestions[qzIdx];
+  const tagColor=q.tag==='SYNONYMS'?'var(--accent2)':q.tag==='ANTONYMS'?'var(--accent)':q.tag==='CONTEXT'?'var(--accent3)':'var(--gold)';
+  let html=`<div class="quiz-card"><div class="q-num"><span style="background:${tagColor};color:#fff;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${q.tag}</span> &nbsp; Question ${qzIdx+1} of ${quizQuestions.length}</div><div class="q-text">${q.q}</div>`;
+  if(q.type==='mcq'){
+    html+=`<div class="q-opts">`;
+    q.opts.forEach((o,i)=>{ html+=`<button class="q-opt" id="qopt${i}" onclick="answerMCQ(${i})">${o}</button>`; });
+    html+=`</div>`;
+  } else {
+    html+=`<input class="fill-q-input" id="qfillInput" placeholder="Type your answer..." /><div class="q-feedback" id="qfillFb"></div>`;
+  }
+  html+=`<div class="q-nav"><span style="font-size:13px;color:var(--ink3);">${qzIdx+1} / ${quizQuestions.length}</span>`;
+  if(q.type==='fill') html+=`<button class="btn-primary" id="qCheckBtn" onclick="answerFill()">Check</button>`;
+  else html+=`<button class="btn-primary" id="qNextBtn" onclick="nextQuestion()" style="display:none;">Next →</button>`;
+  html+=`</div></div>`;
+  document.getElementById('quizContent').innerHTML=html;
+  qzAnswered=false;
+  if(q.type==='fill'){ const inp=document.getElementById('qfillInput'); inp.focus(); inp.onkeydown=e=>{ if(e.key==='Enter') answerFill(); }; }
+}
+function answerMCQ(i){
+  if(qzAnswered) return; qzAnswered=true;
+  const q=quizQuestions[qzIdx];
+  qzAnswers.push(i===q.ans);
+  document.querySelectorAll('.q-opt').forEach((o,j)=>{
+    o.disabled=true;
+    if(j===q.ans) o.classList.add('correct');
+    else if(j===i) o.classList.add('wrong');
+  });
+  document.getElementById('qNextBtn').style.display='block';
+}
+function answerFill(){
+  if(qzAnswered) return; qzAnswered=true;
+  const q=quizQuestions[qzIdx];
+  const val=(document.getElementById('qfillInput').value||'').trim().toLowerCase();
+  const correct=q.ans.includes(val);
+  qzAnswers.push(correct);
+  const inp=document.getElementById('qfillInput'); const fb=document.getElementById('qfillFb');
+  inp.disabled=true;
+  if(correct){ inp.classList.add('correct'); fb.className='q-feedback good'; fb.textContent='✓ Correct!'; }
+  else { inp.classList.add('wrong'); fb.className='q-feedback bad'; fb.textContent='✗ Accepted: '+q.ans.join(', '); }
+  document.getElementById('qCheckBtn').textContent='Next →'; document.getElementById('qCheckBtn').onclick=nextQuestion;
+}
+function nextQuestion(){
+  qzIdx++;
+  if(qzIdx>=quizQuestions.length){
+    const score=qzAnswers.filter(Boolean).length;
+    state.quizScore=score; state.quizDone=true; addPoints(score*10); saveState();
+    showQuizResults(score);
+  } else { renderQuizQuestion(); }
+}
+function showQuizResults(score){
+  document.getElementById('quizProgressBar').style.width='100%';
+  const pct=Math.round(score/quizQuestions.length*100);
+  let grade,advice,color;
+  if(pct>=90){grade='Excellent!';color='var(--accent2)';advice='Outstanding performance! Challenge yourself with more nuanced vocabulary — explore formal register synonyms and their contextual differences.';}
+  else if(pct>=70){grade='Good Work';color='var(--accent3)';advice='Strong understanding! Review any missed questions and focus on contextual synonym usage to push to the next level.';}
+  else if(pct>=50){grade='Satisfactory';color='var(--gold)';advice='You have a basic understanding but need more practice. Revisit the Word Web and Fill-in-the-Blank activities before re-testing.';}
+  else {grade='Keep Practising';color='var(--accent)';advice='Don\'t worry — revisit the Learn section and all activities, work with flashcards daily, and retake the quiz when ready!';}
+  let missedHTML='';
+  if(qzAnswers.length>0){
+    const missedQs=quizQuestions.filter((_,i)=>!qzAnswers[i]);
+    if(missedQs.length){
+      missedHTML=`<div class="missed-list"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">Review these questions:</div>`;
+      missedQs.forEach((q,i)=>{ missedHTML+=`<div class="missed-item"><strong>${q.tag}:</strong> ${q.q} <span class="correct-ans">→ ${q.type==='mcq'?q.opts[q.ans]:q.ans[0]}</span></div>`; });
+      missedHTML+='</div>';
+    }
+  }
+  document.getElementById('quizContent').innerHTML=`
+    <div class="result-wrap">
+      <div class="result-circle" style="border-color:${color};"><div class="result-score">${score}/${quizQuestions.length}</div><div class="result-grade">${pct}%</div></div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:28px;color:${color};margin-bottom:0.75rem;">${grade}</h2>
+      <div class="result-msg">${advice}</div>
+      ${missedHTML}
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+        <button class="btn-secondary" onclick="showPage('tracker')">View Progress</button>
+      </div>
+    </div>
+  `;
+}
+function retakeQuiz(){ state.quizDone=false; state.quizScore=0; saveState(); qzIdx=0; qzAnswers=[]; initQuiz(); }
+
+// ── TRACKER ────────────────────────────────────────────────────────
+const weeks=[
+  {w:'Week 1',title:'Concept Introduction',status:'complete',tasks:['Define synonyms and antonyms','Introduce word pair flashcards','Baseline assessment on Day 1','Create first word web entry']},
+  {w:'Week 2',title:'Active Practice',status:'active',tasks:['Opposite Day antonym game','Synonym Story Swap activity','Thesaurus Treasure Hunt','Mid-unit quiz (Day 10)']},
+  {w:'Week 3',title:'Application & Context',status:'upcoming',tasks:['Word Web creation project','Emotion Spectrum Wall activity','Cross-subject writing tasks','Peer review session']},
+  {w:'Week 4',title:'Review & Assessment',status:'upcoming',tasks:['Kahoot review games (Day 16–17)','End-of-unit test (Day 18)','Portfolio submission (Day 19)','Reflection & celebration (Day 20)']}
+];
+function renderTracker(){
+  document.getElementById('trackerStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${state.points}</div><div class="stat-label">Total Points</div></div>
+    <div class="stat-card"><div class="stat-num">${state.quizDone?state.quizScore+'/10':'—'}</div><div class="stat-label">Quiz Score</div></div>
+    <div class="stat-card"><div class="stat-num">${state.activitiesDone}</div><div class="stat-label">Activities Done</div></div>
+    <div class="stat-card"><div class="stat-num">${state.quizDone?Math.round(state.quizScore/10*100)+'%':'0%'}</div><div class="stat-label">Quiz Mastery</div></div>
+  `;
+  const wt=document.getElementById('weekTimeline'); wt.innerHTML='';
+  weeks.forEach((w,wi)=>{
+    const statusColor=w.status==='complete'?'#2a6b4a':w.status==='active'?'#d4500a':'#8a7a6a';
+    const statusBg=w.status==='complete'?'#e8f5ee':w.status==='active'?'#fff0e8':'#f5f0e8';
+    const statusLabel=w.status==='complete'?'Complete':w.status==='active'?'Active':'Upcoming';
+    let tasksHTML='';
+    w.tasks.forEach((t,ti)=>{
+      const key=`w${wi}t${ti}`;
+      const done=state.tasks[key];
+      tasksHTML+=`<div class="week-task"><div class="task-check ${done?'done':''}" onclick="toggleTask('${key}',this)">${done?'✓':''}</div><span style="${done?'text-decoration:line-through;color:var(--ink3);':''}">${t}</span></div>`;
+    });
+    wt.innerHTML+=`<div class="week-card"><div class="week-header"><div class="week-title">${w.w}</div><span class="week-status" style="background:${statusBg};color:${statusColor};">${statusLabel}</span></div><div style="font-size:12px;color:var(--ink3);margin-bottom:8px;">${w.title}</div><div class="week-tasks">${tasksHTML}</div></div>`;
+  });
+}
+function toggleTask(key,el){
+  state.tasks[key]=!state.tasks[key];
+  el.classList.toggle('done');
+  el.textContent=state.tasks[key]?'✓':'';
+  const span=el.nextElementSibling;
+  span.style.textDecoration=state.tasks[key]?'line-through':'none';
+  span.style.color=state.tasks[key]?'var(--ink3)':'';
+  if(state.tasks[key]) addPoints(2);
+  saveState();
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+
+// Init
+document.getElementById('navScore').textContent='Score: '+state.points+' pts';
+showActivity('cardmatch');
+initSpectrum();
+</script>
+</body>
+</html>
