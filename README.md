@@ -23,4 +23,4 @@ Simply open `index.html` in any modern browser.
 No installation or dependencies required.
 
 ## Live Demo
-[View Live App](https://Trickshot-kid.github.io/wordwise-app)
+[View Live App](https://arnabchy78.github.io/vocabplay-app/)
